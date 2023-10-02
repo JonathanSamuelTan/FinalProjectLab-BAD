@@ -2,12 +2,14 @@ package model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Database {
     private Connection connection;
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/Java";
-    private static final String DB_USER = "Java";
+    private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "";
 
     public void connect() {
@@ -43,4 +45,40 @@ public class Database {
             }
         }
     }
+
+    // Method to insert or update data in the database
+    public boolean insertOrUpdateData(String query, Object... params) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            // Set parameters (if any)
+            for (int i = 0; i < params.length; i++) {
+                preparedStatement.setObject(i + 1, params[i]);
+            }
+            // Execute the query
+            int rowCount = preparedStatement.executeUpdate();
+            return rowCount > 0;
+        } catch (SQLException e) {
+            System.err.println("Error: Failed to insert/update data.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Method to fetch data from the database
+    public ResultSet fetchData(String query, Object... params) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            // Set parameters (if any)
+            for (int i = 0; i < params.length; i++) {
+                preparedStatement.setObject(i + 1, params[i]);
+            }
+            // Execute the query and return the result set
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.err.println("Error: Failed to fetch data.");
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
+
