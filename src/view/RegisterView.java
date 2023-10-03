@@ -2,62 +2,135 @@ package view;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 
 
 public class RegisterView {
-
-    private VBox column;
-    private BorderPane view;
-
-    public RegisterView(){
-        view = new BorderPane();
-        createVBox();
-        createLayout();
+    private Stage primaryStage;
+    private Label header;
+    private Label usernameLabel;
+    private TextField usernameField;
+    private Label emailLabel;
+    private TextField emailField;
+    private Label passwordLabel;
+    private PasswordField passwordField;
+    private Label confirmLabel;
+    private PasswordField confirmField;
+    private Label phoneLabel;
+    private TextField phoneField;
+    private Label addressLabel;
+    private TextArea addressField;
+    private Label genderLabel;
+    private RadioButton genderButtonMale;
+    private RadioButton genderButtonFemale;
+    private CheckBox tc;
+    private Label loginLabel;
+    private Hyperlink loginButton;
+    private Button registerButton;
+    public RegisterView(Stage primaryStage) {
+        this.primaryStage = primaryStage;
     }
-    public void createVBox() {
-        column = new VBox();
-        column.setSpacing(16);
-        column.setAlignment(Pos.CENTER);
+
+    public void showRegisterScene() {
+        primaryStage.setTitle("Register");
+        BorderPane bp = new BorderPane();
+        bp.setCenter(createRegisterForm());
+        bp.setPadding(new Insets(50));
+        Scene scene = new Scene(bp);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private GridPane createRegisterForm() {
+        GridPane fields = new GridPane();
 
         //Header
-        Label header = new Label("Register");
-        Font headerFont = new Font(30);
-        Font.font("System", FontWeight.BOLD, FontPosture.REGULAR,30);
-        header.setFont(headerFont);
+        header = new Label("Register");
+        header.setFont(Font.font("Arial Black", 32));
 
         //Fields
-        GridPane fields = new GridPane();
         fields.setAlignment(Pos.CENTER);
-        fields.setVgap(8);
-        fields.setHgap(16);
-        Label usernameLabel = new Label("Username:");
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Input Username...");
-        fields.setGridLinesVisible(true);
-        fields.add(usernameLabel,0,0);
-        fields.add(usernameField,1,0);
+        fields.setVgap(10);
+        fields.setHgap(10);
+
+        usernameLabel = new Label("Username :");
+        usernameField = new TextField();
+
+        emailLabel = new Label("Email :");
+        emailField = new TextField();
+
+        passwordLabel = new Label("Password :");
+        passwordField = new PasswordField();
+
+        confirmLabel = new Label("Confirm Password :");
+        confirmField = new PasswordField();
+
+        phoneLabel = new Label("Phone Number :");
+        phoneField = new TextField();
+
+        addressLabel = new Label("Address :");
+        addressField = new TextArea();
+
+        genderLabel = new Label("Gender :");
+        genderButtonMale = new RadioButton("Male");
+        genderButtonFemale = new RadioButton("Female");
+        ToggleGroup tg = new ToggleGroup();
+        genderButtonMale.setToggleGroup(tg);
+        genderButtonFemale.setToggleGroup(tg);
+
+        TilePane tp = new TilePane(genderButtonMale, genderButtonFemale);
+
+        tc = new CheckBox("I agree to all terms and condition");
+
+        loginLabel = new Label("Have an account? ");
+        loginButton = new Hyperlink("login here");
+
+        registerButton = new Button("Register");
+
+        TilePane tp2 = new TilePane(loginLabel, loginButton);
+        usernameField.setPromptText("Input username...");
+        emailField.setPromptText("Input email...");
+        passwordField.setPromptText("Input password...");
+        confirmField.setPromptText("Input confirm password...");
+        phoneField.setPromptText("Input phone number...");
+        addressField.setPromptText("Input address...");
+
+
+        fields.add(header,1,0);
+        fields.add(usernameLabel, 0, 1);
+        fields.add(usernameField, 1, 1);
+
+       fields.add(emailLabel, 0, 2);
+        fields.add(emailField, 1, 2);
+
+       fields.add(passwordLabel, 0, 3);
+        fields.add(passwordField, 1, 3);
+
+       fields.add(confirmLabel, 0, 4);
+        fields.add(confirmField, 1, 4);
+
+       fields.add(phoneLabel, 0, 5);
+        fields.add(phoneField, 1, 5);
+
+       fields.add(addressLabel, 0, 6);
+        fields.add(addressField, 1, 6);
+
+       fields.add(genderLabel, 0, 7);
+        fields.add(tp, 1, 7);
+
+       fields.add(tc, 1, 8);
+
+       fields.add(tp2, 1, 9);
+
+       fields.add(registerButton,1,10);
 
 
         //Arrange column
-        column.getChildren().add(header);
-        column.getChildren().add(fields);
+        return fields;
     }
 
-    public void createLayout() {
-        view.setCenter(column);
-        view.setPadding(new Insets(10,50,10,50));
-    }
-
-    public Parent getView() {
-        return view;
-    }
 }
