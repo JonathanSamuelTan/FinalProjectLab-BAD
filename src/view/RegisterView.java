@@ -32,6 +32,8 @@ public class RegisterView {
     private Hyperlink loginButton;
     private Button registerButton;
 
+    private ToggleGroup tg;
+
     public RegisterView(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
@@ -79,7 +81,7 @@ public class RegisterView {
         genderLabel = new Label("Gender :");
         genderButtonMale = new RadioButton("Male");
         genderButtonFemale = new RadioButton("Female");
-        ToggleGroup tg = new ToggleGroup();
+        tg = new ToggleGroup();
         genderButtonMale.setToggleGroup(tg);
         genderButtonFemale.setToggleGroup(tg);
 
@@ -176,5 +178,9 @@ public class RegisterView {
 
     public Button getRegisterButton() {
         return registerButton;
+    }
+
+    public ToggleGroup getTg() {
+        return tg;
     }
 }

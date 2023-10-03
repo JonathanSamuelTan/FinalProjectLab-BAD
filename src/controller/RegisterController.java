@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import model.Database;
 import model.User;
@@ -20,7 +21,7 @@ public class RegisterController {
         db = new Database();
 
         this.view.getRegisterButton().setOnAction(actionEvent -> {
-            System.out.println(generateID());
+            showErrorPopup();
         });
     }
 
@@ -61,21 +62,125 @@ public class RegisterController {
     private String generateID() {
         ArrayList<User> users = getUser();
         int temp = Integer.MIN_VALUE;
-        for (User user:users
-             ) {
-            int temp2 =Integer.parseInt(user.getUserID().substring(2));
-            if (temp < temp2 && user.getUserID().contains("CU")){
+        for (User user : users
+        ) {
+            int temp2 = Integer.parseInt(user.getUserID().substring(2));
+            if (temp < temp2 && user.getUserID().contains("CU")) {
                 temp = temp2;
 
             }
         }
-        return String.format("CU%03d", temp);
+        return String.format("CU%03d", temp + 1);
     }
 
+    private boolean validateEmail() {
+        return this.view.getEmailField().getText().endsWith("@gmail.com");
+    }
 
+    private boolean validateUsernameUnique() {
+        String username = this.view.getUsernameField().getText();
+        ArrayList<User> users = getUser();
+        for (User user : users
+        ) {
+            if (username.equals(user.getUserName())) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    private boolean validateUsernameLength() {
+        String username = this.view.getUsernameField().getText();
+        if (username.length() < 5 || username.length() > 20) {
+            return false;
+        }
+        return true;
+    }
 
+    private boolean validatePasswordAlphanumeric() {
+        String password = this.view.getPasswordField().getText();
+        for (char c : password.toCharArray()) {
+            if (!((c >= '0' && c <= '9') ||
+                    (c >= 'A' && c <= 'Z') ||
+                    (c >= 'a' && c <= 'z'))) {
+                return false;
+            }
+        }
 
+        return true;
+    }
 
+    private boolean validatePasswordChar() {
+        String password = this.view.getPasswordField().getText();
+        if (password.length() < 5) return false;
+        return true;
+    }
+
+    private boolean validateConfirm() {
+        String password = this.view.getPasswordField().getText();
+        String confirm = this.view.getConfirmField().getText();
+        return password.equals(confirm);
+    }
+
+    private boolean validateNumberNumeric() {
+        String number = this.view.getPhoneField().getText();
+        for (char c : number.toCharArray()) {
+            if (!((c >= '0' && c <= '9'))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean validateNumberStart() {
+        String number = this.view.getPhoneField().getText();
+        return number.startsWith("+62");
+    }
+
+    private boolean validateAllFieldsFilled() {
+        String username = this.view.getUsernameField().getText();
+        String email = this.view.getEmailField().getText();
+        String password = this.view.getPasswordField().getText();
+        String confirm = this.view.getConfirmField().getText();
+        String number = this.view.getPhoneField().getText();
+        String address = this.view.getAddressField().getText();
+        boolean gender = this.view.getTg().getSelectedToggle() == null;
+        boolean tc = this.view.getTc().isSelected();
+
+        if (username.isEmpty() ||
+                email.isEmpty() ||
+                password.isEmpty() ||
+                confirm.isEmpty() ||
+                number.isEmpty() ||
+                address.isEmpty() ||
+                gender ||
+                !tc
+        ) return false;
+        return true;
+    }
+
+    private void showErrorPopup() {
+        ArrayList<String> errors = new ArrayList<>();
+        if (!validateEmail()) errors.add("Email must end with ‘@gmail.com'");
+        if (!validateUsernameUnique()) errors.add("Username must be unique.");
+        if (!validateUsernameLength()) errors.add("Username must be 5-20 characters.");
+        if (!validatePasswordAlphanumeric()) errors.add("Password must be alphanumeric.");
+        if (!validatePasswordChar()) errors.add("Password must be at least 5 characters.");
+        if (!validateConfirm()) errors.add("Confirm password must equals to password.");
+        if (!validateNumberNumeric()) errors.add("Phone number must be numeric.");
+        if (!validateNumberStart()) errors.add("Phone number must start with ‘+62’.");
+        if (!validateAllFieldsFilled()) errors.add("All fields must be filled.");
+        StringBuilder sb = new StringBuilder();
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Failed to Register");
+        for (String err:errors
+             ) {
+            sb.append(err+"\n");
+        }
+        alert.setContentText(sb.toString());
+        alert.showAndWait();
+    }
 
 }
