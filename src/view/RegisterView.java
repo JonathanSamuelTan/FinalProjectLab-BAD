@@ -31,6 +31,7 @@ public class RegisterView {
     private Label loginLabel;
     private Hyperlink loginButton;
     private Button registerButton;
+
     public RegisterView(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
@@ -100,37 +101,80 @@ public class RegisterView {
         addressField.setPromptText("Input address...");
 
 
-        fields.add(header,1,0);
+        fields.add(header, 1, 0);
         fields.add(usernameLabel, 0, 1);
         fields.add(usernameField, 1, 1);
 
-       fields.add(emailLabel, 0, 2);
+        fields.add(emailLabel, 0, 2);
         fields.add(emailField, 1, 2);
 
-       fields.add(passwordLabel, 0, 3);
+        fields.add(passwordLabel, 0, 3);
         fields.add(passwordField, 1, 3);
 
-       fields.add(confirmLabel, 0, 4);
+        fields.add(confirmLabel, 0, 4);
         fields.add(confirmField, 1, 4);
 
-       fields.add(phoneLabel, 0, 5);
+        fields.add(phoneLabel, 0, 5);
         fields.add(phoneField, 1, 5);
 
-       fields.add(addressLabel, 0, 6);
+        fields.add(addressLabel, 0, 6);
         fields.add(addressField, 1, 6);
 
-       fields.add(genderLabel, 0, 7);
+        fields.add(genderLabel, 0, 7);
         fields.add(tp, 1, 7);
 
-       fields.add(tc, 1, 8);
+        fields.add(tc, 1, 8);
 
-       fields.add(tp2, 1, 9);
+        fields.add(tp2, 1, 9);
 
-       fields.add(registerButton,1,10);
+        fields.add(registerButton, 1, 10);
 
 
         //Arrange column
         return fields;
     }
 
+    public TextField getUsernameField() {
+        return usernameField;
+    }
+
+    public TextField getEmailField() {
+        return emailField;
+    }
+
+    public PasswordField getPasswordField() {
+        return passwordField;
+    }
+
+    public PasswordField getConfirmField() {
+        return confirmField;
+    }
+
+    public TextField getPhoneField() {
+        return phoneField;
+    }
+
+    public TextArea getAddressField() {
+        return addressField;
+    }
+
+    public RadioButton getGenderButtonMale() {
+        return genderButtonMale;
+    }
+
+    public RadioButton getGenderButtonFemale() {
+        return genderButtonFemale;
+    }
+
+    public CheckBox getTc() {
+        return tc;
+    }
+
+    public Hyperlink getLoginButton() {
+        return loginButton;
+    }
+
+    public Button getRegisterButton() {
+        return registerButton;
+    }
 }

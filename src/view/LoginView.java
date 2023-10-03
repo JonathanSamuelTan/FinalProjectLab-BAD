@@ -1,6 +1,7 @@
 package view;
 
 import controller.LoginController;
+import controller.RegisterController;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,10 +18,13 @@ public class LoginView {
     private Hyperlink registerLink;
     private Stage primaryStage;
     private LoginController loginController;
+    private RegisterController registerController;
+    private RegisterView registerView;
 
     public LoginView(Stage primaryStage, LoginController loginController) {
         this.primaryStage = primaryStage;
         this.loginController = loginController; // Initialize the LoginController
+
     }
 
     public void show() {
@@ -53,6 +57,8 @@ public class LoginView {
         usernameField = new TextField();
         passwordField = new PasswordField();
 
+        registerLink = new Hyperlink("Register here");
+
         loginButton = new Button("Login");
 
         grid.add(loginLabel, 1, 0);
@@ -60,9 +66,18 @@ public class LoginView {
         grid.add(passwordLabel, 0, 2);
         grid.add(usernameField, 1, 1);
         grid.add(passwordField, 1, 2);
-        grid.add(loginButton, 1, 3);
+        grid.add(registerLink,1,3);
+        grid.add(loginButton, 1, 4);
 
         loginButton.setOnAction(event -> handleLoginButtonClick());
+        registerLink.setOnAction(actionEvent ->{
+            registerView = new RegisterView(this.primaryStage);
+            registerView.showRegisterScene();
+            registerController = new RegisterController(registerView);
+
+
+        });
+
 
         return grid;
     }
@@ -89,4 +104,6 @@ public class LoginView {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+
 }
