@@ -57,7 +57,11 @@ public class HpUserView {
 
         // Create layout
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(navbar.userNavbar(primaryStage,userSession), borderPane);
+        if(userSession.getUserRole().equalsIgnoreCase("admin")) {
+        	vbox.getChildren().addAll(navbar.adminNavbar(primaryStage,userSession), borderPane);
+        }else {
+        	vbox.getChildren().addAll(navbar.userNavbar(primaryStage,userSession), borderPane);
+        }
 
         Scene scene = new Scene(vbox, 600, 600);
         primaryStage.setScene(scene);
