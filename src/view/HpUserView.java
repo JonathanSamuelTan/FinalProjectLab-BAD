@@ -1,33 +1,40 @@
 package view;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javafx.geometry.Insets;
 
+import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.User;
 import model.Database;
+import model.Product;
 
 public class HpUserView {
 
     private Stage primaryStage;
     private User userSession;
     private Database db;
+    private List<Product> productList;
     
 
     public HpUserView(Stage primaryStage, User userSession) {
         this.primaryStage = primaryStage;
         this.userSession = userSession;
         this.db = new Database();
+        this.productList = new ArrayList<>();
     }
 
     public void show() {
@@ -98,15 +105,20 @@ public class HpUserView {
         GridPane.setMargin(text, new Insets(0, 0, 0, 10));
         grid.add(text, 0, 0);
 
-        TableView<String> tableView = new TableView<>();
-        TableColumn<String, String> productColumn = new TableColumn<>("Product");
+        TableView<Product> tableView = new TableView<>();
+        TableColumn<Product, String> productColumn = new TableColumn<>("Product");
         productColumn.setPrefWidth(290.0);
+        productColumn.setCellValueFactory(data -> data.getValue().productNameProperty());
         tableView.getColumns().add(productColumn);
         tableView.setMaxHeight(300.0);
         GridPane.setMargin(tableView, new Insets(0, 0, 0, 10));
         GridPane.setRowIndex(tableView, 1);
         GridPane.setValignment(tableView, VPos.TOP);
         grid.add(tableView, 0, 1);
+
+        ObservableList<Product> products = FXCollections.observableArrayList(populateTableView());
+        tableView.setItems(products);
+        
 
         VBox vBox = new VBox();
         vBox.setPrefHeight(200.0);
@@ -124,6 +136,29 @@ public class HpUserView {
         grid.add(vBox, 1, 1);
 
         return grid;
+    }
+    
+    public List<Product> populateTableView() {
+//        List<String> productNames = new ArrayList<>();
+    	try {
+            Connection conn = db.getConnection();
+            String sql = "SELECT * FROM product";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Product product = new Product();
+                product.setProductID(resultSet.getString("productID"));
+                product.setProductName(resultSet.getString("product_name"));
+                product.setProductPrice(resultSet.getInt("product_price"));
+                product.setProductDesc(resultSet.getString("product_des"));
+                productList.add(product);
+//                productNames.add(product.getProductName());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return productList;    	
     }
 
 }
