@@ -24,6 +24,7 @@ public class LoginView {
     private Stage primaryStage;
     private User userSession;
     private Database db;
+    private Hyperlink register;
 
     public LoginView(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -61,19 +62,27 @@ public class LoginView {
         passwordField = new PasswordField();
 
         loginButton = new Button("Login");
+        
+        register = new Hyperlink("Don't have account? Register");
+        
 
         grid.add(loginLabel, 1, 0);
         grid.add(usernameLabel, 0, 1);
         grid.add(passwordLabel, 0, 2);
         grid.add(usernameField, 1, 1);
         grid.add(passwordField, 1, 2);
-        grid.add(loginButton, 1, 3);
+        grid.add(register, 1, 3);
+        grid.add(loginButton, 1, 4);
 
         loginButton.setOnAction(event -> handleLoginButtonClick());
+        register.setOnAction(event -> goToRegister());
 
         return grid;
     }
 
+    private void goToRegister() {
+    	// ini buat avner 	
+    }
     private void handleLoginButtonClick() {
         String username = usernameField.getText();
         String password = passwordField.getText();

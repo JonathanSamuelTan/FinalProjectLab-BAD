@@ -57,7 +57,7 @@ public class HpUserView {
 
         // Create layout
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(navbar.userNavbar(), borderPane);
+        vbox.getChildren().addAll(navbar.userNavbar(primaryStage,userSession), borderPane);
 
         Scene scene = new Scene(vbox, 600, 600);
         primaryStage.setScene(scene);
@@ -140,6 +140,7 @@ public class HpUserView {
 
         // Display product details
         Label nameLabel = new Label(product.getProductName());
+        nameLabel.setFont(Font.font("Arial Black", 12));
         Text descLabel = new Text(product.getProductDesc());
         descLabel.setWrappingWidth(200); // Set wrapping width
         descLabel.setLineSpacing(5); // Set line spacing
@@ -160,8 +161,13 @@ public class HpUserView {
         qtc.getChildren().addAll(qtcLabel,spinner);
 
         Button addCartBTN = new Button("Add to Cart");
-
-        vBox.getChildren().addAll(nameLabel, descLabel,priceLabel,qtc,addCartBTN);
+        
+        if(userSession.getUserRole().equalsIgnoreCase("admin")) {
+        	vBox.getChildren().addAll(nameLabel, descLabel,priceLabel);
+        }else {
+        	vBox.getChildren().addAll(nameLabel, descLabel,priceLabel,qtc,addCartBTN);
+        }
+        
     }
 
     public List<Product> populateTableView() {
