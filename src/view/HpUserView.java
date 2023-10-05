@@ -4,19 +4,29 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javafx.geometry.Insets;
-
 import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.*;
+import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import model.User;
 import model.Database;
@@ -28,7 +38,6 @@ public class HpUserView {
     private User userSession;
     private Database db;
     private List<Product> productList;
-    
 
     public HpUserView(Stage primaryStage, User userSession) {
         this.primaryStage = primaryStage;
@@ -41,44 +50,23 @@ public class HpUserView {
         primaryStage.setTitle("Home Page");
 
         // Create menu bar
-        MenuBar menuBar = createMenuBar();
+        Navbar navbar = new Navbar();
 
         // Create center content
-        GridPane centerGrid = createCenterGrid();
-        
-        
+        BorderPane borderPane = createCenterContent();
 
         // Create layout
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(menuBar, centerGrid);
+        vbox.getChildren().addAll(navbar.userNavbar(), borderPane);
 
         Scene scene = new Scene(vbox, 600, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    
+    private BorderPane createCenterContent() {
+        BorderPane borderPane = new BorderPane();
 
-    private MenuBar createMenuBar() {
-        MenuBar menuBar = new MenuBar();
-
-        Menu menuHome = new Menu("Home");
-        MenuItem homePageItem = new MenuItem("Home Page");
-        menuHome.getItems().add(homePageItem);
-
-        Menu menuCart = new Menu("Cart");
-        MenuItem myCartItem = new MenuItem("My Cart");
-        menuCart.getItems().add(myCartItem);
-
-        Menu menuAccount = new Menu("Account");
-        MenuItem transactionHistoryItem = new MenuItem("Transaction History");
-        MenuItem logOutItem = new MenuItem("Log Out");
-        menuAccount.getItems().addAll(transactionHistoryItem, logOutItem);
-
-        menuBar.getMenus().addAll(menuHome, menuCart, menuAccount);
-
-        return menuBar;
-    }
-
-    private GridPane createCenterGrid() {
         GridPane grid = new GridPane();
         grid.setPrefHeight(577);
         grid.setPrefWidth(598);
@@ -107,8 +95,8 @@ public class HpUserView {
 
         TableView<Product> tableView = new TableView<>();
         TableColumn<Product, String> productColumn = new TableColumn<>("Product");
+        productColumn.setCellValueFactory(cellData -> cellData.getValue().productNameProperty());
         productColumn.setPrefWidth(290.0);
-        productColumn.setCellValueFactory(data -> data.getValue().productNameProperty());
         tableView.getColumns().add(productColumn);
         tableView.setMaxHeight(300.0);
         GridPane.setMargin(tableView, new Insets(0, 0, 0, 10));
@@ -118,7 +106,6 @@ public class HpUserView {
 
         ObservableList<Product> products = FXCollections.observableArrayList(populateTableView());
         tableView.setItems(products);
-        
 
         VBox vBox = new VBox();
         vBox.setPrefHeight(200.0);
@@ -133,14 +120,53 @@ public class HpUserView {
 
         vBox.getChildren().addAll(welcomeText, selectProductText);
         GridPane.setMargin(vBox, new Insets(0, 0, 0, 10));
+
+        // Add event listener to update the right side when a product is selected
+        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                displayProductDetails(newSelection, vBox);
+            }
+        });
+
         grid.add(vBox, 1, 1);
 
-        return grid;
+        borderPane.setCenter(grid);
+        return borderPane;
     }
-    
+
+    private void displayProductDetails(Product product, VBox vBox) {
+        // Clear the existing content
+        vBox.getChildren().clear();
+
+        // Display product details
+        Label nameLabel = new Label(product.getProductName());
+        Text descLabel = new Text(product.getProductDesc());
+        descLabel.setWrappingWidth(200); // Set wrapping width
+        descLabel.setLineSpacing(5); // Set line spacing
+        descLabel.setTextAlignment(TextAlignment.LEFT); 
+        Text priceLabel = new Text("Price: Rp." + product.getProductPrice());
+        
+        // quantity
+        HBox qtc = new HBox();
+        Label qtcLabel = new Label("Quantity: ");
+     	// Create a SpinnerValueFactory with custom min, max, and initial values
+        SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0,100, 0);
+
+        // Create a Spinner with the custom value factory
+        Spinner<Integer> spinner = new Spinner<>();
+        spinner.setValueFactory(valueFactory);
+        
+        qtc.getChildren().addAll(qtcLabel,spinner);
+
+        Button addCartBTN = new Button("Add to Cart");
+
+        vBox.getChildren().addAll(nameLabel, descLabel,priceLabel,qtc,addCartBTN);
+    }
+
     public List<Product> populateTableView() {
-//        List<String> productNames = new ArrayList<>();
-    	try {
+        List<Product> products = new ArrayList<>();
+        try {
             Connection conn = db.getConnection();
             String sql = "SELECT * FROM product";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
@@ -152,13 +178,11 @@ public class HpUserView {
                 product.setProductName(resultSet.getString("product_name"));
                 product.setProductPrice(resultSet.getInt("product_price"));
                 product.setProductDesc(resultSet.getString("product_des"));
-                productList.add(product);
-//                productNames.add(product.getProductName());
+                products.add(product);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return productList;    	
+        return products;
     }
-
 }
