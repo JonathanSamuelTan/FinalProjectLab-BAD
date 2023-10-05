@@ -1,49 +1,71 @@
 package model;
 
+import javafx.beans.property.*;
+
 public class Product {
-	private String productID;
-	private String productName;
-	private int productPrice;
-	private String productDesc;
+    private final StringProperty productID = new SimpleStringProperty();
+    private final StringProperty productName = new SimpleStringProperty();
+    private final IntegerProperty productPrice = new SimpleIntegerProperty();
+    private final StringProperty productDesc = new SimpleStringProperty();
 
+    public Product(String productID, String productName, int productPrice, String productDesc) {
+        setProductID(productID);
+        setProductName(productName);
+        setProductPrice(productPrice);
+        setProductDesc(productDesc);
+    }
 
-	public Product(String productID, String productName, int productPrice, String productDesc) {
-		this.productID = productID;
-		this.productName = productName;
-		this.productPrice = productPrice;
-		this.productDesc = productDesc;
-	}
+    public Product() {
+        this("", "", 0, "");
+    }
 
-	public String getProductID() {
-		return productID;
-	}
+    // Getter methods for properties
+    public String getProductID() {
+        return productID.get();
+    }
 
-	public String getProductName() {
-		return productName;
-	}
+    public StringProperty productIDProperty() {
+        return productID;
+    }
 
-	public int getProductPrice() {
-		return productPrice;
-	}
+    public String getProductName() {
+        return productName.get();
+    }
 
-	public String getProductDesc() {
-		return productDesc;
-	}
+    public StringProperty productNameProperty() {
+        return productName;
+    }
 
-	public void setProductID(String productID) {
-		this.productID = productID;
-	}
+    public int getProductPrice() {
+        return productPrice.get();
+    }
 
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
+    public IntegerProperty productPriceProperty() {
+        return productPrice;
+    }
 
-	public void setProductPrice(int productPrice) {
-		this.productPrice = productPrice;
-	}
+    public String getProductDesc() {
+        return productDesc.get();
+    }
 
-	public void setProductDesc(String productDesc) {
-		this.productDesc = productDesc;
-	}
+    public StringProperty productDescProperty() {
+        return productDesc;
+    }
 
+    // Setter methods for properties
+    public void setProductID(String productID) {
+        this.productID.set(productID);
+    }
+
+    public void setProductName(String productName) {
+        this.productName.set(productName);
+    }
+
+    public void setProductPrice(int productPrice) {
+        this.productPrice.set(productPrice);
+    }
+
+    public void setProductDesc(String productDesc) {
+        this.productDesc.set(productDesc);
+    }
 }
