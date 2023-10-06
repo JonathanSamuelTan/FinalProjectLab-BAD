@@ -1,6 +1,9 @@
 import javafx.application.Application;
 import javafx.stage.Stage;
 import view.LoginView;
+import view.Navbar;
+import view.HpUserView;
+import view.ManageProductView;
 
 public class Main extends Application {
 
@@ -11,9 +14,11 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Create an instance of the LoginView and pass a new LoginController to it
-        LoginView loginView = new LoginView(primaryStage);
-
+        //new LoginView(primaryStage).show();
+        //new HpUserView(primaryStage,null).show();
         // Start the login view
-        loginView.show();
+    	
+    	ManageProductView test=new ManageProductView(primaryStage);
+        test.show();
     }
 }
