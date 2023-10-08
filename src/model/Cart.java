@@ -1,38 +1,29 @@
 package model;
-
+import javafx.beans.property.*;
 public class Cart {
-	private String productID;
-	private String userID;
-	private int quantity;
+	private final StringProperty productID = new SimpleStringProperty();
+	private final StringProperty userID = new SimpleStringProperty();
+	private final IntegerProperty quantity = new SimpleIntegerProperty();
+
+
 
 	public Cart(String productID, String userID, int quantity) {
-		this.productID = productID;
-		this.userID = userID;
-		this.quantity = quantity;
+		this.productID.set(productID);
+		this.userID.set(userID);
+		this.quantity.set(quantity);
 	}
-		
-	public String getProductID() {
+
+
+	public StringProperty getProductID() {
 		return productID;
 	}
 
-	public String getUserID() {
+	public StringProperty getUserID() {
 		return userID;
 	}
 
-	public int getQuantity() {
+	public IntegerProperty getQuantity() {
 		return quantity;
-	}
-
-	public void setProductID(String productID) {
-		this.productID = productID;
-	}
-
-	public void setUserID(String userID) {
-		this.userID = userID;
-	}
-
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
 	}
 
 }
