@@ -26,9 +26,7 @@ import java.util.List;
 public class CartView {
     private Stage primaryStage;
     private User userSession;
-    private Label titleLabel, prodNameLabel, prodDetailLabel, prodPriceLabel, quantityLabel, totalLabel, totalPriceLabel, orderInfoLabel, userInfoLabel, phoneInfoLabel, addressInfoLabel;
-    private Spinner quantitySpinner;
-    private Button updateButton, removeButton, makePurchaseButton;
+
     private ObservableList<Cart> cartItems;
     private ListView listView;
 
@@ -86,7 +84,7 @@ public class CartView {
         GridPane.setMargin(text, new Insets(0, 0, 0, 10));
         grid.add(text, 0, 0);
 
-        ListView<Cart> listView = new ListView<>();
+        listView = new ListView<>();
         listView.setMaxHeight(300.0);
         GridPane.setMargin(listView, new Insets(0, 0, 0, 10));
         GridPane.setRowIndex(listView, 1);
@@ -176,5 +174,9 @@ public class CartView {
             e.printStackTrace();
         }
         return cartItems;
+    }
+
+    public ListView getListView() {
+        return listView;
     }
 }
