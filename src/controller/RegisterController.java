@@ -1,9 +1,12 @@
 package controller;
 
+import com.mysql.cj.log.Log;
 import javafx.scene.control.Alert;
+import javafx.scene.control.RadioButton;
 import javafx.stage.Stage;
 import model.Database;
 import model.User;
+import view.LoginView;
 import view.RegisterView;
 
 import java.sql.Connection;
@@ -15,14 +18,85 @@ import java.util.ArrayList;
 public class RegisterController {
     private RegisterView view;
     private Database db;
+    private Stage primaryStage;
 
-    public RegisterController(RegisterView view) {
-        this.view = view;
+    public RegisterController(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        this.view = new RegisterView(this.primaryStage);
         db = new Database();
 
         this.view.getRegisterButton().setOnAction(actionEvent -> {
-            showErrorPopup();
+            if(     validateConfirm()&&
+                    validateEmail()&&
+                    validateNumberStart()&&
+                    validateNumberNumeric()&&
+                    validateAllFieldsFilled()&&
+                    validatePasswordChar()&&
+                    validateUsernameLength()&&
+                    validateUsernameUnique()&&validatePasswordAlphanumeric()) {
+                completeRegister();
+                showSuccessPopup();
+                goToLogin();
+            } else {
+                showErrorPopup();
+            }
         });
+
+        this.view.getLoginButton().setOnAction(actionEvent -> {
+            goToLogin();
+
+        });
+    }
+
+    private void showSuccessPopup() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText("Registered Successfully!");
+        alert.showAndWait();
+    }
+
+    private  void goToLogin() {
+        LoginView loginView = new LoginView(primaryStage);
+        loginView.show();
+    }
+
+    private void completeRegister() {
+        String userID =generateID();
+        String username = view.getUsernameField().getText();
+        String password = view.getPasswordField().getText();
+        String role = "User";
+        String address = view.getAddressField().getText();
+        String phone = view.getPhoneField().getText();
+        RadioButton genderRadio = (RadioButton) view.getTg().getSelectedToggle();
+        String gender = genderRadio.getText();
+
+
+
+        db.connect();
+        Connection connection = db.getConnection();
+
+        if (connection != null) {
+            try {
+                // Prepare a SQL query to check if the email and password match
+                String query = "INSERT INTO user VALUES(?,?,?,?,?,?,?);";
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1,userID);
+                preparedStatement.setString(2,username);
+                preparedStatement.setString(3,password);
+                preparedStatement.setString(4,role);
+                preparedStatement.setString(5,address);
+                preparedStatement.setString(6,phone);
+                preparedStatement.setString(7,gender);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                db.closeConnection();
+            }
+        }
+
+
     }
 
     private ArrayList<User> getUser() {
@@ -125,7 +199,7 @@ public class RegisterController {
     private boolean validateNumberNumeric() {
         String number = this.view.getPhoneField().getText();
         for (char c : number.toCharArray()) {
-            if (!((c >= '0' && c <= '9'))) {
+            if (!((c >= '0' && c <= '9') || c=='+')) {
                 return false;
             }
         }
@@ -182,5 +256,7 @@ public class RegisterController {
         alert.setContentText(sb.toString());
         alert.showAndWait();
     }
+
+
 
 }

@@ -36,6 +36,7 @@ public class RegisterView {
 
     public RegisterView(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        showRegisterScene();
     }
 
     public void showRegisterScene() {
