@@ -4,12 +4,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.User;
@@ -20,124 +26,109 @@ public class ManageProductView {
 	//private ObservableList<Product> products = FXCollections.observableArrayList();
 	private Database db;
     private Stage primaryStage;
-    //table
-	private TableView<Product> tableView = new TableView<>();
 	//input new product
-	private ToggleButton toggleButton = new ToggleButton("Add Product");
 	private Button addButton = new Button("Add Product");
-	Label labelName = new Label("Input Product Name:");
-    TextField fieldName = new TextField();
-    Label labelPrice = new Label("Input Product Price:");
-    TextField fieldPrice = new TextField();
-    TextArea fieldDescription = new TextArea();
-    Connection connection;  
-
+	 
 
 	public ManageProductView(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.db = new Database();
-        connection=db.getConnection();
 	}
 	
 	public void show() {
-		//text area cuman bisa di taro disini., gabisa diatas
-	    Label labelDescription = new Label("Enter Product Description:");
-		fieldDescription.setPromptText("Enter text here");
-		fieldDescription.setPrefColumnCount(20);
-		fieldDescription.setPrefRowCount(5);
-		 
-	   
-	   primaryStage.setTitle("Product CRUD App");
-	   createTable();
-        
-        //input box
-        VBox inputBox = new VBox(10); // 10 is the spacing between elements
-        inputBox.getChildren().addAll(labelName, fieldName, labelPrice, fieldPrice,labelDescription,fieldDescription);
-        
-        // vbox.getChildren().add(button);
-        //vbox.getChildren().remove(button);
-        
+		primaryStage.setTitle("Product CRUD App");
         addButton.setOnAction(event-> {
-        	try {
-				insertProduct();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        	moveAddProduct();
         });
         
-        //sideBar
-        VBox sideBar = new VBox(10); // 10 is the spacing between elements
+        //---------------------------SIDE BAR--------------------------------//
+        VBox sideBar = new VBox(5); // 10 is the spacing between elements
+        Label productNameLabel= new Label("welcome,admin");
+        Label descriptionLabel = new Label("select product to update");
+        Button removeButton=new Button("Remove");
+        Button updateButton=new Button("Update");
         sideBar.getChildren().addAll(
-    		new Label("Welcome, Admin!"),
-            new Label("Select a product to update"),
-            toggleButton
+        	productNameLabel,
+        	descriptionLabel,
+            addButton,
+            removeButton,
+            updateButton
         );
+        removeButton.setVisible(false);
+        updateButton.setVisible(false);
+
+        //------------------------View BAR-----------------------------//
+        // Create a border with desired properties
+        TableView<Product> tableView = new TableView<>();
+ 
+        TableColumn<Product, String> firstNameColumn = new TableColumn<>("product");
+        firstNameColumn.setCellValueFactory(data -> data.getValue().productNameProperty());
+        firstNameColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.99));
+        tableView.getColumns().addAll(firstNameColumn);
         
-        toggleButton.setOnAction(event -> {
-        	if(toggleButton.isSelected()) {
-        		sideBar.getChildren().add(inputBox);
-        		inputBox.getChildren().add(addButton);
-                toggleButton.setText("Back");
-        	}else {
-        		sideBar.getChildren().remove(inputBox);
-        		inputBox.getChildren().remove(addButton);
-                toggleButton.setText("Add Product");
-        	}
+        // Create an ObservableList to hold the data
+        ArrayList<Product> productList=Product.retreiveRecord();
+        ObservableList<Product> data = FXCollections.observableArrayList();
+        for (Product product : productList) {
+            data.add(product); // Use get() to access the String value
+        }
+        tableView.setItems(data);
         
+
+        // Add a selection listener to the TableView
+        tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                // When a new item is selected, update the descriptionLabel with the productDescProperty
+            	productNameLabel.setText(newValue.productNameProperty().get());
+            	descriptionLabel.setText(newValue.productDescProperty().get());
+            	removeButton.setVisible(true);
+                updateButton.setVisible(true);
+                
+                removeButton.setOnAction(event-> {
+                	Product.removeProduct(newValue.productIDProperty().get());
+                	updateTableView(tableView);
+                  });
+                updateButton.setOnAction(event-> {
+                	Product.updateProduct(newValue.productIDProperty().get());
+                	moveUpdateProduct(newValue.productIDProperty().get());
+                  });
+           		 
+            } else {
+                // If nothing is selected, clear the descriptionLabel
+            	productNameLabel.setText("");
+                descriptionLabel.setText("");
+                removeButton.setVisible(false);
+                updateButton.setVisible(false);
+            }
         });
-        
+       
+         
+
         //main bar
-        HBox root = new HBox(10);
-        root.getChildren().addAll(tableView, sideBar);
+        HBox root = new HBox(15);
+        root.setPadding( new Insets(20));
+        root.getChildren().addAll( tableView,sideBar);
+ 
 
         Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
 	}
 	
-	void createTable() {
-		TableView<Product> productTable = new TableView<>();
-	       productTable.setEditable(true);
-
-	       TableColumn<Product, String> nameColumn = new TableColumn<>("Name");
-	       TableColumn<Product, Double> priceColumn = new TableColumn<>("Price");
-    
-	        
-	       productTable.getColumns().addAll(nameColumn, priceColumn);
-	       addButton.setOnAction(e -> {
-				try {
-					insertProduct();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			});
+	public void updateTableView(TableView<Product> tableView) {
+	    ArrayList<Product> productList = Product.retreiveRecord();
+	    ObservableList<Product> data = FXCollections.observableArrayList(productList);
+	    tableView.setItems(data);
 	}
 	
-	void insertProduct() throws SQLException {
-		  //belom masukin productID
-		    String name = fieldName.getText();
-	        double price = Double.parseDouble(fieldPrice.getText());
-	        String description= fieldDescription.getText();
-	        
-	        String insertSQL = "INSERT INTO product (product_name,  product_price,product_description) VALUES (?, ?, ?)";
-     
-	        try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-	            preparedStatement.setString(1, name);
-	            preparedStatement.setDouble(2, price);
-	            preparedStatement.setString(3, description);
-
-	            // Execute the insert statement
-	            preparedStatement.executeUpdate();
-
-	            System.out.println("Product added successfully!");
-	        }
-	        
-	        //clear the input
-	        fieldName.clear();
-	        fieldPrice.clear();
-	        fieldDescription.clear();
-}
+	void moveAddProduct() {
+		Scene AddProductScene= new AddProduct().createAddScene();
+        primaryStage.setScene(AddProductScene);
+	}
+	
+	void moveUpdateProduct(String productID) {
+		Scene updateProductScene= new updateProduct().createUpdateScene(productID);
+        primaryStage.setScene(updateProductScene);
+	}
 
 }
