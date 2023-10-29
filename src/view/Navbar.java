@@ -1,5 +1,4 @@
 package view;
-import controller.CartController;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -33,7 +32,7 @@ public class Navbar {
         });
 
         myCartItem.setOnAction(event -> {
-            CartController cartController = new CartController(primaryStage, userSession);
+            CartView cartView = new CartView(primaryStage, userSession);
         });
 
         transactionHistoryItem.setOnAction(event -> {
