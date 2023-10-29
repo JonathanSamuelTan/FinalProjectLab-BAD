@@ -28,6 +28,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import model.Cart;
 import model.User;
 import model.Database;
 import model.Product;
@@ -148,9 +149,9 @@ public class HpUserView {
         Text descLabel = new Text(product.getProductDesc());
         descLabel.setWrappingWidth(200); // Set wrapping width
         descLabel.setLineSpacing(5); // Set line spacing
-        descLabel.setTextAlignment(TextAlignment.LEFT); 
-        Text priceLabel = new Text("Price: Rp." + product.getProductPrice());
-        
+        descLabel.setTextAlignment(TextAlignment.LEFT);
+
+
         // quantity
         HBox qtc = new HBox();
         Label qtcLabel = new Label("Quantity: ");
@@ -161,10 +162,14 @@ public class HpUserView {
         // Create a Spinner with the custom value factory
         Spinner<Integer> spinner = new Spinner<>();
         spinner.setValueFactory(valueFactory);
-        
+        Text priceLabel = new Text("Price: Rp." + product.getProductPrice() * spinner.getValue());
+        spinner.valueProperty().addListener((obs, oldValue, newValue) ->
+                priceLabel.setText("Price: Rp." + product.getProductPrice() * Integer.valueOf(newValue)));
+
         qtc.getChildren().addAll(qtcLabel,spinner);
 
         Button addCartBTN = new Button("Add to Cart");
+        addCartBTN.setOnAction(event -> addToCart(product,spinner.getValue()));
         
         if(userSession.getUserRole().equalsIgnoreCase("admin")) {
         	vBox.getChildren().addAll(nameLabel, descLabel,priceLabel);
@@ -172,6 +177,21 @@ public class HpUserView {
         	vBox.getChildren().addAll(nameLabel, descLabel,priceLabel,qtc,addCartBTN);
         }
         
+    }
+
+    private void addToCart(Product product, Integer value) {
+
+        try {
+            Connection conn = db.getConnection();
+            String sql = "INSERT INTO cart VALUES(?,?,?)";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, product.getProductID());
+            preparedStatement.setString(2, userSession.getUserID());
+            preparedStatement.setInt(3, value);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<Product> populateTableView() {
@@ -195,4 +215,6 @@ public class HpUserView {
         }
         return products;
     }
+
+
 }

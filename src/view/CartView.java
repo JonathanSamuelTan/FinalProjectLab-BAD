@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -11,10 +12,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import model.Cart;
-import model.Database;
-import model.Product;
-import model.User;
+import model.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,8 +25,9 @@ public class CartView {
     private Stage primaryStage;
     private User userSession;
 
-    private ObservableList<Cart> cartItems;
-    private ListView listView;
+    private ObservableList<CartList> cartItems;
+    private ListView<CartList> listView;
+
 
     public CartView(Stage stage, User userSession) {
         this.primaryStage = stage;
@@ -45,6 +44,7 @@ public class CartView {
         // Create center content
         BorderPane borderPane = createCenterContent();
 
+
         // Create layout
         VBox vbox = new VBox();
         vbox.getChildren().addAll(navbar.userNavbar(primaryStage, userSession), borderPane);
@@ -53,6 +53,25 @@ public class CartView {
         Scene scene = new Scene(vbox, 600, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private VBox CreateUserDetailContent() {
+        VBox vBox = new VBox();
+        int total = 0;
+        if (cartItems != null)
+        for (CartList cart : cartItems) {
+            total += cart.getProductPrice() * cart.getQuantity();
+        }
+        Text totalText = new Text("Total: Rp." + total);
+        Text orderText = new Text("Order Information");
+        orderText.setFont(Font.font("Arial Black", 15));
+        Text userNameText = new Text("Name: " + userSession.getUserName());
+        Text userPhoneNumber = new Text("Phone Number: " + userSession.getUserPhone());
+        Text userAddressText = new Text("Address: " + userSession.getUserAddress());
+        Button purchase = new Button("Make Purchase");
+        vBox.setSpacing(8);
+        vBox.getChildren().addAll(totalText, orderText, userNameText, userPhoneNumber, userAddressText, purchase);
+        return vBox;
     }
 
     private BorderPane createCenterContent() {
@@ -86,27 +105,30 @@ public class CartView {
 
         listView = new ListView<>();
         listView.setMaxHeight(300.0);
-        GridPane.setMargin(listView, new Insets(0, 0, 0, 10));
-        GridPane.setRowIndex(listView, 1);
-        GridPane.setValignment(listView, VPos.TOP);
-        grid.add(listView, 0, 1);
+
+
+
 
         cartItems = FXCollections.observableArrayList(populateListView());
         listView.setItems(cartItems);
 
+        VBox userDetail = CreateUserDetailContent();
+        VBox listAndDetail = new VBox();
+        listAndDetail.getChildren().addAll(listView, userDetail);
+
+        grid.add(listAndDetail, 0, 1);
+        GridPane.setMargin(listAndDetail, new Insets(0, 0, 0, 10));
         VBox vBox = new VBox();
         vBox.setPrefHeight(200.0);
         vBox.setPrefWidth(100.0);
         vBox.setSpacing(10.0);
         GridPane.setColumnIndex(vBox, 1);
         GridPane.setRowIndex(vBox, 1);
+        GridPane.setColumnSpan(vBox, 2);
 
-        Text welcomeText = new Text("Welcome, " + name);
-        welcomeText.setFont(Font.font("Arial Black", 15));
-        Text selectProductText = new Text("Select Product to add and remove");
 
-        vBox.getChildren().addAll(welcomeText, selectProductText);
         GridPane.setMargin(vBox, new Insets(0, 0, 0, 10));
+
 
         // Add event listener to update the right side when a product is selected
         listView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -121,54 +143,70 @@ public class CartView {
         return borderPane;
     }
 
-    private void displayProductDetails(Cart cart, VBox vBox) {
+    private void displayProductDetails(CartList cart, VBox vBox) {
         // Clear the existing content
         vBox.getChildren().clear();
-
+        if (cartItems.isEmpty()) {
+            Label emptyLabel = new Label("No Item in Cart!");
+            Text emptyText = new Text("Consider adding one!");
+            vBox.getChildren().addAll(emptyLabel, emptyText);
+            return;
+        }
         // Display product details
-        Label nameLabel = new Label(cart.getProductID().get());
+        Label nameLabel = new Label(cart.getProductName());
         nameLabel.setFont(Font.font("Arial Black", 12));
-        Text descLabel = new Text(cart.getProductID().get());
+        Text descLabel = new Text(cart.getProductDesc());
         descLabel.setWrappingWidth(200); // Set wrapping width
         descLabel.setLineSpacing(5); // Set line spacing
         descLabel.setTextAlignment(TextAlignment.LEFT);
-        Text priceLabel = new Text("Price: Rp." + cart.getQuantity().get());
+        Text priceLabel = new Text("Price: Rp." + cart.getProductPrice() * cart.getQuantity());
+
 
         // quantity
         HBox qtc = new HBox();
         Label qtcLabel = new Label("Quantity: ");
         // Create a SpinnerValueFactory with custom min, max, and initial values
         SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0);
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, cart.getQuantity());
 
         // Create a Spinner with the custom value factory
         Spinner<Integer> spinner = new Spinner<>();
         spinner.setValueFactory(valueFactory);
+        spinner.valueProperty().addListener((obs, oldValue, newValue) ->
+                priceLabel.setText("Price: Rp." + cart.getProductPrice() * Integer.valueOf(newValue)));
 
         qtc.getChildren().addAll(qtcLabel, spinner);
+        FlowPane flowPane = new FlowPane();
+        Button updateCartBtn = new Button("Update Cart");
+        Button removeCartBtn = new Button("Remove from Cart");
+        flowPane.getChildren().addAll(updateCartBtn, removeCartBtn);
 
-        Button addCartBTN = new Button("Add to Cart");
+        vBox.getChildren().addAll(nameLabel, descLabel, priceLabel, qtc, flowPane);
 
-        if (userSession.getUserRole().equalsIgnoreCase("admin")) {
-            vBox.getChildren().addAll(nameLabel, descLabel, priceLabel);
-        } else {
-            vBox.getChildren().addAll(nameLabel, descLabel, priceLabel, qtc, addCartBTN);
-        }
 
     }
 
-    public List<Cart> populateListView() {
-        List<Cart> cartItems = new ArrayList<>();
+    public List<CartList> populateListView() {
+        List<CartList> cartItems = new ArrayList<>();
         try {
             Database db = new Database();
             Connection conn = db.getConnection();
-            String sql = "SELECT * FROM product";
+            String sql = "SELECT * FROM Cart JOIN Product ON Cart.productID = Product.productID WHERE userID = ?";
+
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, userSession.getUserID());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Cart cart = new Cart(resultSet.getString("productID"),resultSet.getString("product_name"),resultSet.getInt("product_price"));
-                cartItems.add(cart);
+                CartList cartItem = new CartList(
+                        resultSet.getString("productID"),
+                        resultSet.getString("userID"),
+                        resultSet.getString("product_name"),
+                        resultSet.getInt("product_price"),
+                        resultSet.getInt("quantity"),
+                        resultSet.getString("product_des")
+                );
+                cartItems.add(cartItem);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -179,4 +217,6 @@ public class CartView {
     public ListView getListView() {
         return listView;
     }
+
+
 }
