@@ -32,8 +32,7 @@ public class Navbar {
         });
 
         myCartItem.setOnAction(event -> {
-            // Handle My Cart item click
-            // Place your logic here
+            CartView cartView = new CartView(primaryStage, userSession);
         });
 
         transactionHistoryItem.setOnAction(event -> {
