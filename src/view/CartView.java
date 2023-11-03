@@ -330,7 +330,8 @@ public class CartView {
                     preparedStatement.setString(2, userSession.getUserID());
                     successMsg = "Deleted from Cart";
                 } else if (value + cart.getQuantity() > 0) {
-                    sql = "UPDATE cart SET quantity = ? + quantity WHERE productID = ? AND userID = ?";
+//                  sql = "UPDATE cart SET quantity = ? + quantity WHERE productID = ? AND userID = ?";
+                    sql = "UPDATE cart SET quantity = ? WHERE productID = ? AND userID = ?";
                     preparedStatement = conn.prepareStatement(sql);
                     preparedStatement.setInt(1, value);
                     preparedStatement.setString(2, cart.getProductID());
