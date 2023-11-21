@@ -296,7 +296,7 @@ public class EditProductScene {
 	    }
 	
 	  void insertProduct(String name,String priceText,String description) throws SQLException {
-		  if (name.isEmpty() && priceText.trim().isEmpty() && description.isEmpty()) {
+		  if (name.isEmpty() || priceText.trim().isEmpty() || description.isEmpty()) {
 			    System.out.println("please fill the required text field");
 	            return;
 	        }
