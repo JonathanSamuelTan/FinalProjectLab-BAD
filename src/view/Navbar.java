@@ -36,8 +36,8 @@ public class Navbar {
         });
 
         transactionHistoryItem.setOnAction(event -> {
-            // Handle Transaction History item click
-            // Place your logic here
+            TransactionScene transactionScene = new TransactionScene(primaryStage, userSession);
+            transactionScene.show();
         });
 
         logOutItem.setOnAction(event -> {
