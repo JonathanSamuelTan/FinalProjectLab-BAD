@@ -171,7 +171,6 @@ public class HpUserView {
         }else {
         	vBox.getChildren().addAll(nameLabel, descLabel,priceLabel,qtc,addCartBTN);
         }
-        
     }
 
     public List<Product> populateTableView() {
@@ -183,12 +182,12 @@ public class HpUserView {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Product product = new Product();
-                product.setProductID(resultSet.getString("productID"));
-                product.setProductName(resultSet.getString("product_name"));
-                product.setProductPrice(resultSet.getInt("product_price"));
-                product.setProductDesc(resultSet.getString("product_des"));
-                products.add(product);
+          //      Product product = new Product();
+//                product.setProductID(resultSet.getString("productID"));
+//                product.setProductName(resultSet.getString("product_name"));
+//                product.setProductPrice(resultSet.getInt("product_price"));
+//                product.setProductDesc(resultSet.getString("product_des"));
+               // products.add(product);
             }
         } catch (SQLException e) {
             e.printStackTrace();

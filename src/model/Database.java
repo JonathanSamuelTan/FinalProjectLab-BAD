@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Database {
-    static Connection connection;
+    private Connection connection;
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/bad-lab";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "password";
@@ -14,7 +14,7 @@ public class Database {
         connect();
     }
 
-    public static void connect() {
+    public void connect() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
