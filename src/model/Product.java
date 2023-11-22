@@ -26,8 +26,6 @@ public class Product {
         this.db=new Database();
     }    
     
-  
-    
 
     public StringProperty productIDProperty() {
         return productID;
