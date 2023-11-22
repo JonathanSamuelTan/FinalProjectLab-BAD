@@ -10,6 +10,8 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Database;
 import model.TransactionDetail;
@@ -55,7 +57,7 @@ public class TransactionScene {
         // Create center section with transaction list and details
         VBox centerVBox = createCenterSection();
         borderPane.setCenter(centerVBox);
-
+        
         return borderPane;
     }
 
@@ -67,9 +69,10 @@ public class TransactionScene {
         topVBox.getChildren().add(navbar.userNavbar(primaryStage, userSession)); // Use userNavbar or adminNavbar based on user role
 
         // Add user info label
-        Label usernameLabel = new Label(userSession.getUserName() + "'s Purchase History");
-        usernameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px"); // Set font style
+        Text usernameLabel = new Text(userSession.getUserName() + "'s Purchase History");
+        usernameLabel.setFont(Font.font("Arial Black", 27));
         topVBox.getChildren().add(usernameLabel);
+        topVBox.setMargin(usernameLabel, new Insets(10));
 
         return topVBox;
     }
@@ -116,7 +119,8 @@ public class TransactionScene {
         // Retrieve a list of Transaction IDs for the current user from the database
         // Modify this method based on your database schema
         // Example code:
-        try (Connection connection = db.getConnection()) {
+        try{
+        	Connection connection = db.getConnection();
             String sql = "SELECT transactionID FROM transaction_header WHERE userID = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, userSession.getUserID());
@@ -139,7 +143,8 @@ public class TransactionScene {
         // Retrieve transaction details for the selected Transaction ID from the database
         // Modify this method based on your database schema
         // Example code:
-        try (Connection connection = db.getConnection()) {
+        try{
+        	Connection connection = db.getConnection();
             String sql = "SELECT * FROM transaction_header WHERE transactionID = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, transactionID);
@@ -182,15 +187,21 @@ public class TransactionScene {
             return details.toString();
         } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("SQLException: " + e.getMessage());
+            System.err.println("SQLState: " + e.getSQLState());
+            System.err.println("VendorError: " + e.getErrorCode());
             return "Error fetching transaction details.";
         }
     }
 
+
+   
     private List<TransactionDetail> fetchTransactionDetailsList(String transactionID) {
         // Retrieve a list of Transaction Details for the selected Transaction ID from the database
         // Modify this method based on your database schema
         // Example code:
-        try (Connection connection = db.getConnection()) {
+        try{
+        	Connection connection = db.getConnection();
             String sql = "SELECT * FROM transaction_detail WHERE transactionID = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, transactionID);
@@ -218,10 +229,9 @@ public class TransactionScene {
     }
 
     private String fetchProductName(String productID) {
-        // Retrieve the product name for the given product ID from the database
-        // Modify this method based on your database schema
-        // Example code:
-        try (Connection connection = db.getConnection()) {
+ 
+        try{
+        	Connection connection = db.getConnection();
             String sql = "SELECT product_name FROM product WHERE productID = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, productID);
@@ -243,7 +253,8 @@ public class TransactionScene {
         // Retrieve product price for the given product ID from the database
         // Modify this method based on your database schema
         // Example code:
-        try (Connection connection = db.getConnection()) {
+        try {
+        	Connection connection = db.getConnection();
             String sql = "SELECT product_price FROM product WHERE productID = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, productID);
@@ -265,7 +276,8 @@ public class TransactionScene {
         // Retrieve total price for the given transaction ID from the database
         // Modify this method based on your database schema
         // Example code:
-        try (Connection connection = db.getConnection()) {
+        try {
+        	Connection connection = db.getConnection();
             String sql = "SELECT SUM(product.product_price * transaction_detail.quantity) AS total_price " +
                          "FROM transaction_detail " +
                          "JOIN product ON transaction_detail.productID = product.productID " +
