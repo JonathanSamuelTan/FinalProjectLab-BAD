@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
+import controller.RegisterController;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,20 +18,23 @@ import model.User;
 import model.Database;
 
 
+
 public class LoginView {
     private Label usernameLabel, passwordLabel, loginLabel;
     private TextField usernameField;
     private PasswordField passwordField;
     private Button loginButton;
+    private Hyperlink registerLink;
     private Stage primaryStage;
     private User userSession;
     private Database db;
     private Hyperlink register;
+    private RegisterController registerController;
 
     public LoginView(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.db = new Database();
-    }
+        this.db = new Database();  }
+
 
     public void show() {
         primaryStage.setTitle("Login Page");
@@ -62,9 +67,9 @@ public class LoginView {
         passwordField = new PasswordField();
 
         loginButton = new Button("Login");
-        
+
         register = new Hyperlink("Don't have account? Register");
-        
+
 
         grid.add(loginLabel, 1, 0);
         grid.add(usernameLabel, 0, 1);
@@ -78,17 +83,19 @@ public class LoginView {
         register.setOnAction(event -> goToRegister());
 
         return grid;
-    }
+
+        }
 
     private void goToRegister() {
-    	// ini buat avner 	
+        registerController = new RegisterController(this.primaryStage);
+
     }
     private void handleLoginButtonClick() {
         String username = usernameField.getText();
         String password = passwordField.getText();
         
         
-        
+
         if (isValid(username, password) != null) {
         	User userSession = isValid(username, password);
         	HpUserView homePage = new HpUserView(primaryStage,userSession);
@@ -133,7 +140,7 @@ public class LoginView {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-            } 
+            }
         }
         return null;
     }

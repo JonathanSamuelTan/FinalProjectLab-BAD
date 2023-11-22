@@ -32,13 +32,12 @@ public class Navbar {
         });
 
         myCartItem.setOnAction(event -> {
-            // Handle My Cart item click
-            // Place your logic here
+            CartView cartView = new CartView(primaryStage, userSession);
         });
 
         transactionHistoryItem.setOnAction(event -> {
-            // Handle Transaction History item click
-            // Place your logic here
+            TransactionScene transactionScene = new TransactionScene(primaryStage, userSession);
+            transactionScene.show();
         });
 
         logOutItem.setOnAction(event -> {

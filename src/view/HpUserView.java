@@ -11,12 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -28,6 +23,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import model.Cart;
 import model.User;
 import model.Database;
 import model.Product;
@@ -148,9 +144,10 @@ public class HpUserView {
         Text descLabel = new Text(product.getProductDesc());
         descLabel.setWrappingWidth(200); // Set wrapping width
         descLabel.setLineSpacing(5); // Set line spacing
-        descLabel.setTextAlignment(TextAlignment.LEFT); 
+        descLabel.setTextAlignment(TextAlignment.LEFT);
         Text priceLabel = new Text("Price: Rp." + product.getProductPrice());
-        
+
+
         // quantity
         HBox qtc = new HBox();
         Label qtcLabel = new Label("Quantity: ");
@@ -161,15 +158,59 @@ public class HpUserView {
         // Create a Spinner with the custom value factory
         Spinner<Integer> spinner = new Spinner<>();
         spinner.setValueFactory(valueFactory);
-        
-        qtc.getChildren().addAll(qtcLabel,spinner);
+        Text totalPrice = new Text("Total: Rp.0");
+        spinner.valueProperty().addListener((obs, oldValue, newValue) ->
+                totalPrice.setText("Total: Rp." + product.getProductPrice() * Integer.valueOf(newValue)));
+
+
+        qtc.getChildren().addAll(qtcLabel,spinner,totalPrice);
 
         Button addCartBTN = new Button("Add to Cart");
+        addCartBTN.setOnAction(event -> addToCart(product,spinner.getValue()));
         
         if(userSession.getUserRole().equalsIgnoreCase("admin")) {
         	vBox.getChildren().addAll(nameLabel, descLabel,priceLabel);
         }else {
         	vBox.getChildren().addAll(nameLabel, descLabel,priceLabel,qtc,addCartBTN);
+        }
+    }
+
+    private void addToCart(Product product, Integer value) {
+        if(value >0) {
+            try {
+                Connection conn = db.getConnection();
+                String checkTr = "SELECT productID FROM Cart WHERE productID = ? AND userID = ?";
+                PreparedStatement checkTrStatement = conn.prepareStatement(checkTr);
+                checkTrStatement.setString(1, product.getProductID());
+                checkTrStatement.setString(2, userSession.getUserID());
+                ResultSet resultSet = checkTrStatement.executeQuery();
+                if (resultSet.next()) {
+                    String update = "UPDATE cart SET quantity = quantity + ? WHERE productID = ? AND userID = ?";
+                    PreparedStatement updateStatement = conn.prepareStatement(update);
+                    updateStatement.setInt(1, value);
+                    updateStatement.setString(2, product.getProductID());
+                    updateStatement.setString(3, userSession.getUserID());
+                    updateStatement.executeUpdate();
+                } else {
+                    String sql = "INSERT INTO cart VALUES(?,?,?)";
+                    PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                    preparedStatement.setString(1, product.getProductID());
+                    preparedStatement.setString(2, userSession.getUserID());
+                    preparedStatement.setInt(3, value);
+                    preparedStatement.executeUpdate();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            Alert success = new Alert(Alert.AlertType.INFORMATION);
+            success.setTitle("Message");
+            success.setHeaderText("Added to Cart");
+            success.showAndWait();
+        } else {
+            Alert fail = new Alert(Alert.AlertType.ERROR);
+            fail.setTitle("Error");
+            fail.setHeaderText("Failed to add to Cart");
+            fail.showAndWait();
         }
     }
 
@@ -194,4 +235,6 @@ public class HpUserView {
         }
         return products;
     }
+
+
 }
