@@ -365,7 +365,7 @@ public class EditProductScene {
 			    while (resultSet.next()) {
 			    	String productID = resultSet.getString("productID");
 			    	String productName = resultSet.getString("product_name");
-			    	Double productPrice = resultSet.getDouble("product_price");
+			    	Integer productPrice = resultSet.getInt("product_price");
 			    	String productDesc = resultSet.getString("product_description");
 			        
 			        // Create a new ArrayList to store the data
