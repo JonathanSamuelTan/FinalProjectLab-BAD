@@ -173,7 +173,6 @@ public class HpUserView {
         }else {
         	vBox.getChildren().addAll(nameLabel, descLabel,priceLabel,qtc,addCartBTN);
         }
-        
     }
 
     private void addToCart(Product product, Integer value) {

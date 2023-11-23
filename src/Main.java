@@ -10,10 +10,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Create an instance of the LoginView and pass a new LoginController to it
-        LoginView loginView = new LoginView(primaryStage);
+         // Create an instance of the LoginView and pass a new LoginController to it
+         LoginView loginView = new LoginView(primaryStage);
 
-        // Start the login view
-        loginView.show();
-    }
+         // Start the login view
+         loginView.show();
+     }
 }

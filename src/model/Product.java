@@ -1,25 +1,27 @@
 package model;
-
 import javafx.beans.property.*;
 
 public class Product {
-    private final StringProperty productID = new SimpleStringProperty();
-    private final StringProperty productName = new SimpleStringProperty();
-    private final IntegerProperty productPrice = new SimpleIntegerProperty();
-    private final StringProperty productDesc = new SimpleStringProperty();
+	 private final StringProperty productID;
+	 private final StringProperty productName;
+	 private final IntegerProperty productPrice;
+	 private final StringProperty productDesc;
+	 Database db;
 
-    public Product(String productID, String productName, int productPrice, String productDesc) {
-        setProductID(productID);
-        setProductName(productName);
-        setProductPrice(productPrice);
-        setProductDesc(productDesc);
+    public Product(String productID, String productName, Integer productPrice, String productDesc) {
+        super();
+        this.productID = new SimpleStringProperty(productID);
+        this.productName = new SimpleStringProperty(productName);
+        this.productPrice = new SimpleIntegerProperty(productPrice);
+        this.productDesc = new SimpleStringProperty(productDesc);
+        this.db=new Database();
     }
-
+    
     public Product() {
         this("", "", 0, "");
     }
-
-    // Getter methods for properties
+    
+ // Getter methods for properties
     public String getProductID() {
         return productID.get();
     }
