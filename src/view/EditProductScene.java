@@ -5,18 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -47,11 +42,6 @@ public class EditProductScene {
         root.setPadding( new Insets(20));
         
         productList=retreiveRecord();
-
-		if(!userSession.getUserRole().equals("admin")) {
-			new HpUserView(primaryStage,userSession).show();
-			return;
-		}
 		
         Label title=new Label("Manage Products");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 28)); // You can adjust the font and size
@@ -234,13 +224,7 @@ public class EditProductScene {
 	        String price = fieldPrice.getText();
 	        String description= fieldDescription.getText();
 	        
-	        try {
-				insertProduct(name, price, description);
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	        insertProduct(name, price, description);
 	        
 	        fieldName.clear();
 	        fieldPrice.clear();
@@ -259,9 +243,75 @@ public class EditProductScene {
         return inputBox;
 	}
 	
+	 public static Alert createErrorAlert(String contentText) {
+	        Alert alert = new Alert(Alert.AlertType.ERROR);
+	        alert.setTitle("Error");
+	        alert.setHeaderText(null);
+	        alert.setContentText(contentText);
+	        return alert;
+		 }
+		 
+	 void insertProduct(String name, String priceText, String description) {
+		    // Validate inputs
+		    if (name.isEmpty() || priceText.trim().isEmpty() || description.isEmpty()) {
+		        showAlert("Error", "Please fill in all the fields.", AlertType.ERROR);
+		        return;
+		    }
+		    
+		    for (Product product : productList) {
+		        if (name.equals(product.getProductName())) {
+		            showAlert("Error", "Product name must be unique.", AlertType.ERROR);
+		            return;
+		        }
+		    }
+
+		    Integer price = 0;
+		    try {
+		        price = Integer.parseInt(priceText);
+		    } catch (NumberFormatException e) {
+		        showAlert("Error", "Please enter a valid number for the price.", AlertType.ERROR);
+		        return;
+		    }
+
+		    if (price <= 0) {
+		        showAlert("Error", "Please enter a price greater than zero.", AlertType.ERROR);
+		        return;
+		    }
+
+		    // Insert product into the database
+		    String insertSQL = "INSERT INTO product (productID, product_name, product_price, product_des) VALUES (?, ?, ?, ?)";
+		    Connection conn = db.getConnection();
+		    try (PreparedStatement preparedStatement = conn.prepareStatement(insertSQL)) {
+		        String index = Integer.toString(productList.size()+1);
+		        String id = (productList.size() > 99) ? "TE" + index : (productList.size() > 9) ? "TE0" + index : "TE00" + index;
+
+		        preparedStatement.setString(1, id);
+		        preparedStatement.setString(2, name);
+		        preparedStatement.setDouble(3, price); // Assuming product_price is of type double in the database
+		        preparedStatement.setString(4, description);
+
+		        // Execute the insert statement
+		        preparedStatement.executeUpdate();
+
+		        showAlert("Success", "Product added successfully!", AlertType.INFORMATION);
+		    } catch (SQLException e) {
+		        // Handle any SQL exception
+		        e.printStackTrace();
+		        showAlert("Error", "Error inserting product into the database.", AlertType.ERROR);
+		    }
+		}
+
+		private void showAlert(String title, String content, AlertType alertType) {
+		    Alert alert = new Alert(alertType);
+		    alert.setTitle(title);
+		    alert.setHeaderText(null);
+		    alert.setContentText(content);
+		    alert.showAndWait();
+		}
+	
 	 public void updateProduct(String productID,String priceText) {
 		 if(priceText.trim().isEmpty()) {
-			 System.out.println("please fill the require price text");
+			 showAlert("Error", "Please fill the input text", AlertType.ERROR);
 			 return;
 		 }
 		 
@@ -269,7 +319,7 @@ public class EditProductScene {
 	     try {
 	        price= Double.parseDouble(priceText);
 	     } catch (NumberFormatException e) {
-	    	System.out.println("input only number in price");
+	    	showAlert("Error", "input only number in price", AlertType.ERROR);
 	        return;  
 	     }
 	    
@@ -286,54 +336,17 @@ public class EditProductScene {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Product with productID " + productID + " updated successfully.");
+            	showAlert("Success", "Product with productID " + productID + " updated successfully.", AlertType.INFORMATION);
             } else {
-                System.out.println("Product with productID " + productID + " not found or not updated.");
+            	showAlert("Error", "Product with productID " + productID + " not found or not updated.", AlertType.ERROR);
             }
 	        } catch (SQLException e) {
 	            e.printStackTrace();
+	            showAlert("Error", "An error occurred while updating the product.", AlertType.ERROR);
 	        }
 	    }
+	 
 	
-	  void insertProduct(String name,String priceText,String description) throws SQLException {
-		  if (name.isEmpty() || priceText.trim().isEmpty() || description.isEmpty()) {
-			    System.out.println("please fill the required text field");
-	            return;
-	        }
-		  
- 		  double price;
-		    try {
-		        price= Double.parseDouble(priceText);
-		    } catch (NumberFormatException e) {
-		    	System.out.println("input only number in price");
- 		        return;  
-		    }
-		    
-		    if(price<=0) {
-		    	return;
-		    }
-		    
- 		  for(Product product: productList) {
-			  if(name == product.getProductName()) {
-				  System.out.println("product name cannot be same");
-				  return;
-			  }
-		  }
-	        
-		  
-		  String insertSQL = "INSERT INTO product (product_name,  product_price,product_description) VALUES (?, ?, ?)";
-           Connection conn = db.getConnection();
-	        try (PreparedStatement preparedStatement = conn.prepareStatement(insertSQL)) {
-	            preparedStatement.setString(1, name);
-	            preparedStatement.setDouble(2, price);
-	            preparedStatement.setString(3, description);
-
-	            // Execute the insert statement
-	            preparedStatement.executeUpdate();
-
-	            System.out.println("Product added successfully!");
-	        }
-	  }
 	  
 	 public void removeProduct(String productID) {
 	        String deleteSQL = "DELETE FROM Product WHERE productID = ?";
@@ -342,12 +355,10 @@ public class EditProductScene {
 	            preparedStatement.setString(1, productID);
 	            int rowsAffected = preparedStatement.executeUpdate();
 	            if (rowsAffected > 0) {
-	                System.out.println("Product with productId " + productID + " deleted successfully.");
+	            	showAlert("Success", "Product with productId " + productID + " deleted successfully.", AlertType.INFORMATION);
 	            } else {
-	                System.out.println("Product with productId " + productID + " not found or not deleted.");
+	            	showAlert("Error", "Product with productId " + productID + " not found or not deleted.", AlertType.ERROR);
 	            }
-	            
-	           // new EditProductScene(primaryStage,userSession);
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
@@ -358,7 +369,7 @@ public class EditProductScene {
 			ArrayList<Product> products=new ArrayList<>();
 	        Connection conn = db.getConnection();
 			
-			String query = "SELECT productID,product_name,product_price,product_description FROM Product";
+			String query = "SELECT productID,product_name,product_price,product_des FROM Product";
 			try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {
 			    ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -366,7 +377,7 @@ public class EditProductScene {
 			    	String productID = resultSet.getString("productID");
 			    	String productName = resultSet.getString("product_name");
 			    	Integer productPrice = resultSet.getInt("product_price");
-			    	String productDesc = resultSet.getString("product_description");
+			    	String productDesc = resultSet.getString("product_des");
 			        
 			        // Create a new ArrayList to store the data
 			    	Product product=new Product(productID,productName,productPrice,productDesc);

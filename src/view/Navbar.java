@@ -27,7 +27,7 @@ public class Navbar {
 
         // Add event listeners to menu items
         homePageItem.setOnAction(event -> {
-        	HpUserView homePage = new HpUserView(primaryStage,userSession);
+        	HomePageView homePage = new HomePageView(primaryStage,userSession);
             homePage.show();
         });
 
@@ -67,13 +67,13 @@ public class Navbar {
 
         // Add event listeners to menu items
         homePageItem.setOnAction(event -> {
-        	HpUserView homePage = new HpUserView(primaryStage,userSession);
+        	HomePageView homePage = new HomePageView(primaryStage,userSession);
             homePage.show();
         });
 
         ProductItem.setOnAction(event -> {
-            // Handle Manage Product item click
-            // Place your logic here
+            EditProductScene product = new EditProductScene(primaryStage, userSession);
+            product.show();
         });
 
         logOutItem.setOnAction(event -> {

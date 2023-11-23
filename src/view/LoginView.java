@@ -98,7 +98,7 @@ public class LoginView {
 
         if (isValid(username, password) != null) {
         	User userSession = isValid(username, password);
-        	HpUserView homePage = new HpUserView(primaryStage,userSession);
+        	HomePageView homePage = new HomePageView(primaryStage,userSession);
             homePage.show();
         } else {
             // Invalid credentials, show an error message

@@ -28,14 +28,14 @@ import model.User;
 import model.Database;
 import model.Product;
 
-public class HpUserView {
+public class HomePageView {
 
     private Stage primaryStage;
     private User userSession;
     private Database db;
     private List<Product> productList;
 
-    public HpUserView(Stage primaryStage, User userSession) {
+    public HomePageView(Stage primaryStage, User userSession) {
         this.primaryStage = primaryStage;
         this.userSession = userSession;
         this.db = new Database();
