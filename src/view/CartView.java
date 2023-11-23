@@ -252,7 +252,7 @@ public class CartView {
 
 
         GridPane.setMargin(vBox, new Insets(0, 0, 0, 10));
-
+        displayProductDetails(null, vBox);
 
         // Add event listener to update the right side when a product is selected
         listView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -270,9 +270,17 @@ public class CartView {
     private void displayProductDetails(CartList cart, VBox vBox) {
         // Clear the existing content
         vBox.getChildren().clear();
-        if (cartItems.isEmpty()) {
+        if (cartItems.size() == 0 && cart == null) {
             Label emptyLabel = new Label("No Item in Cart!");
+            emptyLabel.setFont(Font.font("Arial Black", 12));
             Text emptyText = new Text("Consider adding one!");
+            vBox.getChildren().addAll(emptyLabel, emptyText);
+            return;
+        }
+        if (cart == null){
+            Label emptyLabel = new Label("Welcome, " + userSession.getUserName());
+            emptyLabel.setFont(Font.font("Arial Black", 12));
+            Text emptyText = new Text("Select a product to add and remove");
             vBox.getChildren().addAll(emptyLabel, emptyText);
             return;
         }
