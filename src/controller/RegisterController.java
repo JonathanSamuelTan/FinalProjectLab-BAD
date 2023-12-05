@@ -1,6 +1,5 @@
 package controller;
 
-import com.mysql.cj.log.Log;
 import javafx.scene.control.Alert;
 import javafx.scene.control.RadioButton;
 import javafx.stage.Stage;
@@ -64,7 +63,7 @@ public class RegisterController {
         String userID =generateID();
         String username = view.getUsernameField().getText();
         String password = view.getPasswordField().getText();
-        String role = "User";
+        String role = "Customer";
         String address = view.getAddressField().getText();
         String phone = view.getPhoneField().getText();
         RadioButton genderRadio = (RadioButton) view.getTg().getSelectedToggle();
