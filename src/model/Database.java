@@ -1,3 +1,8 @@
+/*
+ *  Ud konfirmasi ke ko Hans (HI), tdk wajib pakai singleton 
+ *  
+ */
+
 package model;
 
 import java.sql.Connection;
