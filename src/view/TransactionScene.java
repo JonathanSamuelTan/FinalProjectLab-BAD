@@ -38,8 +38,6 @@ public class TransactionScene {
 
     public void show() {
         primaryStage.setTitle(userSession.getUserName() + "'s Purchase History");
-
-        // Create layout
         BorderPane borderPane = createTransactionLayout();
 
         Scene scene = new Scene(borderPane, 800, 600);
@@ -49,12 +47,8 @@ public class TransactionScene {
 
     private BorderPane createTransactionLayout() {
         BorderPane borderPane = new BorderPane();
-
-        // Create top section with Navbar and user info
         VBox topVBox = createTopSection();
         borderPane.setTop(topVBox);
-
-        // Create center section with transaction list and details
         VBox centerVBox = createCenterSection();
         borderPane.setCenter(centerVBox);
         
@@ -63,12 +57,9 @@ public class TransactionScene {
 
     private VBox createTopSection() {
         VBox topVBox = new VBox();
-
-        // Create and add your Navbar to the top
         Navbar navbar = new Navbar();
         topVBox.getChildren().add(navbar.userNavbar(primaryStage, userSession)); // Use userNavbar or adminNavbar based on user role
 
-        // Add user info label
         Text usernameLabel = new Text(userSession.getUserName() + "'s Purchase History");
         usernameLabel.setFont(Font.font("Arial Black", 27));
         topVBox.getChildren().add(usernameLabel);
@@ -82,19 +73,15 @@ public class TransactionScene {
         centerVBox.setPadding(new Insets(10));
         centerVBox.setSpacing(10);
 
-        // ListView for displaying Transaction IDs
         ListView<String> transactionListView = new ListView<>();
         ObservableList<String> transactionItems = FXCollections.observableArrayList(fetchTransactionIDs());
         transactionListView.setItems(transactionItems);
 
-        // Set max height to be a little over half of the screen
         double screenHeight = primaryStage.getHeight();
         transactionListView.setMaxHeight(screenHeight * 0.6);
 
-        // Label to display instruction text or transaction details
         Label instructionLabel = new Label("Select a transaction to view details");
 
-        // Set event handler for ListView item click
         transactionListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 String transactionID = newSelection;
@@ -103,7 +90,6 @@ public class TransactionScene {
             }
         });
 
-        // Set HBox for ListView and Label
         HBox hbox = new HBox(transactionListView, instructionLabel);
         hbox.setSpacing(10);
 
@@ -116,9 +102,6 @@ public class TransactionScene {
     
 
     private List<String> fetchTransactionIDs() {
-        // Retrieve a list of Transaction IDs for the current user from the database
-        // Modify this method based on your database schema
-        // Example code:
         try{
         	Connection connection = db.getConnection();
             String sql = "SELECT transactionID FROM transaction_header WHERE userID = ?";
@@ -140,9 +123,6 @@ public class TransactionScene {
     }
 
     private String fetchTransactionDetails(String transactionID) {
-        // Retrieve transaction details for the selected Transaction ID from the database
-        // Modify this method based on your database schema
-        // Example code:
         try{
         	Connection connection = db.getConnection();
             String sql = "SELECT * FROM transaction_header WHERE transactionID = ?";
@@ -160,13 +140,9 @@ public class TransactionScene {
 
                 details.append("Transaction ID: ").append(header.getTransactionIDtransactionID()).append("\n");
                 details.append("Username: ").append(userSession.getUserName()).append("\n");
-
-                // Fetch additional details like phone number, address, total price, etc.
-                // Modify this part based on your database schema
                 details.append("Phone Number: ").append(userSession.getUserPhone()).append("\n");
                 details.append("Address: ").append(userSession.getUserAddress()).append("\n");
 
-                // Fetch and display Transaction Details (quantity x product name)
                 List<TransactionDetail> transactionDetailsList = fetchTransactionDetailsList(transactionID);
                 details.append("Transaction Details:\n");
 
@@ -180,7 +156,6 @@ public class TransactionScene {
                             .append(totalProductPrice).append(")\n");
                 }
 
-                // Fetch and append other details...
                 details.append("Total Price: Rp.").append(fetchTotalPrice(transactionID)).append("\n");
             }
 
@@ -197,9 +172,6 @@ public class TransactionScene {
 
    
     private List<TransactionDetail> fetchTransactionDetailsList(String transactionID) {
-        // Retrieve a list of Transaction Details for the selected Transaction ID from the database
-        // Modify this method based on your database schema
-        // Example code:
         try{
         	Connection connection = db.getConnection();
             String sql = "SELECT * FROM transaction_detail WHERE transactionID = ?";
@@ -215,9 +187,6 @@ public class TransactionScene {
                         resultSet.getString("productID"),
                         resultSet.getInt("quantity")
                 );
-                // Fetch additional details like product name, total product price, etc.
-                // Modify this part based on your database schema
-
                 transactionDetailsList.add(transactionDetail);
             }
 
@@ -250,9 +219,6 @@ public class TransactionScene {
     }
 
     private long fetchProductPrice(String productID) {
-        // Retrieve product price for the given product ID from the database
-        // Modify this method based on your database schema
-        // Example code:
         try {
         	Connection connection = db.getConnection();
             String sql = "SELECT product_price FROM product WHERE productID = ?";
@@ -264,7 +230,7 @@ public class TransactionScene {
             if (resultSet.next()) {
                 return resultSet.getLong("product_price");
             } else {
-                return 0; // Default value or handle appropriately
+                return 0;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -273,9 +239,6 @@ public class TransactionScene {
     }
 
     private long fetchTotalPrice(String transactionID) {
-        // Retrieve total price for the given transaction ID from the database
-        // Modify this method based on your database schema
-        // Example code:
         try {
         	Connection connection = db.getConnection();
             String sql = "SELECT SUM(product.product_price * transaction_detail.quantity) AS total_price " +
@@ -290,7 +253,7 @@ public class TransactionScene {
             if (resultSet.next()) {
                 return resultSet.getLong("total_price");
             } else {
-                return 0; // Default value or handle appropriately
+                return 0;
             }
         } catch (SQLException e) {
             e.printStackTrace();

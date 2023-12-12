@@ -25,7 +25,7 @@ public class Navbar {
 
         menuBar.getMenus().addAll(menuHome, menuCart, menuAccount);
 
-        // Add event listeners to menu items
+        // Event Listener
         homePageItem.setOnAction(event -> {
         	HomePageView homePage = new HomePageView(primaryStage,userSession);
             homePage.show();
@@ -65,7 +65,7 @@ public class Navbar {
 
         menuBar.getMenus().addAll(menuHome, menuProduct, menuAccount);
 
-        // Add event listeners to menu items
+        // Event Listener
         homePageItem.setOnAction(event -> {
         	HomePageView homePage = new HomePageView(primaryStage,userSession);
             homePage.show();

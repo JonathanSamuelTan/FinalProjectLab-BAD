@@ -44,15 +44,10 @@ public class HomePageView {
 
     public void show() {
         primaryStage.setTitle("Home Page");
-
-        // Create menu bar
         Navbar navbar = new Navbar();
-
-        // Create center content
         BorderPane borderPane = createCenterContent();
-
-        // Create layout
         VBox vbox = new VBox();
+        
         if(userSession.getUserRole().equalsIgnoreCase("admin")) {
         	vbox.getChildren().addAll(navbar.adminNavbar(primaryStage,userSession), borderPane);
         }else {
@@ -121,7 +116,7 @@ public class HomePageView {
         vBox.getChildren().addAll(welcomeText, selectProductText);
         GridPane.setMargin(vBox, new Insets(0, 0, 0, 10));
 
-        // Add event listener to update the right side when a product is selected
+        // event listener to update the right side when a product is selected
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 displayProductDetails(newSelection, vBox);
@@ -135,10 +130,7 @@ public class HomePageView {
     }
 
     private void displayProductDetails(Product product, VBox vBox) {
-        // Clear the existing content
         vBox.getChildren().clear();
-
-        // Display product details
         Label nameLabel = new Label(product.getProductName());
         nameLabel.setFont(Font.font("Arial Black", 12));
         Text descLabel = new Text(product.getProductDesc());
@@ -151,11 +143,11 @@ public class HomePageView {
         // quantity
         HBox qtc = new HBox();
         Label qtcLabel = new Label("Quantity: ");
-     	// Create a SpinnerValueFactory with custom min, max, and initial values
+  
         SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0,100, 0);
 
-        // Create a Spinner with the custom value factory
+        // Spinner
         Spinner<Integer> spinner = new Spinner<>();
         spinner.setValueFactory(valueFactory);
         Text totalPrice = new Text("Total: Rp.0");

@@ -38,11 +38,7 @@ public class LoginView {
 
     public void show() {
         primaryStage.setTitle("Login Page");
-
-        // Create center content
         GridPane centerGrid = createLoginForm();
-
-        // Create layout
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(centerGrid);
 
@@ -101,7 +97,6 @@ public class LoginView {
         	HomePageView homePage = new HomePageView(primaryStage,userSession);
             homePage.show();
         } else {
-            // Invalid credentials, show an error message
             showError("Failed to Login. Invalid Credential");
         }
     }
@@ -114,12 +109,10 @@ public class LoginView {
         alert.showAndWait();
     }
     public User isValid(String username, String password) {
-        // Check if the provided email and password are valid
         Connection connection = db.getConnection();
 
         if (connection != null) {
             try {
-                // Prepare a SQL query to check if the email and password match
                 String sql = "SELECT * FROM User WHERE username = ? AND password = ?";
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setString(1, username);

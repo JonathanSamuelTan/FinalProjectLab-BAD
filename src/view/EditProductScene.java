@@ -44,7 +44,7 @@ public class EditProductScene {
         productList=retreiveRecord();
 		
         Label title=new Label("Manage Products");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 28)); // You can adjust the font and size
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 28)); 
 
 	
         VBox sideBar = new VBox(10);  
@@ -148,7 +148,7 @@ public class EditProductScene {
 		Button removeButton=new Button("Remove Product");
 		Button backButton=new Button("Back");
 		Label confirmationLabel=new Label("Are you sure, you want to remove this product?");
-        confirmationLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14)); // You can adjust the font and size
+        confirmationLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14)); 
 
 		
 		buttons.getChildren().addAll(removeButton,backButton);
@@ -169,7 +169,7 @@ public class EditProductScene {
 	}
 	
 	VBox updateProductForm(String productID) {
-		VBox inputBox = new VBox(10); // 10 is the spacing between elements
+		VBox inputBox = new VBox(10);
 	    Label labelPrice = new Label("Update Product");
 	    TextField fieldPrice = new TextField();
 	    fieldPrice.setPromptText("Input new price");
@@ -287,15 +287,11 @@ public class EditProductScene {
 
 		        preparedStatement.setString(1, id);
 		        preparedStatement.setString(2, name);
-		        preparedStatement.setDouble(3, price); // Assuming product_price is of type double in the database
+		        preparedStatement.setDouble(3, price);
 		        preparedStatement.setString(4, description);
-
-		        // Execute the insert statement
 		        preparedStatement.executeUpdate();
-
 		        showAlert("Success", "Product added successfully!", AlertType.INFORMATION);
 		    } catch (SQLException e) {
-		        // Handle any SQL exception
 		        e.printStackTrace();
 		        showAlert("Error", "Error inserting product into the database.", AlertType.ERROR);
 		    }
@@ -378,8 +374,6 @@ public class EditProductScene {
 			    	String productName = resultSet.getString("product_name");
 			    	Integer productPrice = resultSet.getInt("product_price");
 			    	String productDesc = resultSet.getString("product_des");
-			        
-			        // Create a new ArrayList to store the data
 			    	Product product=new Product(productID,productName,productPrice,productDesc);
 			    	products.add(product);
 			    }

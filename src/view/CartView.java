@@ -40,17 +40,12 @@ public class CartView {
     private void showCartView() {
         primaryStage.setTitle("Cart");
 
-        // Create menu bar
         Navbar navbar = new Navbar();
 
-        // Create center content
         BorderPane borderPane = createCenterContent();
 
-
-        // Create layout
         VBox vbox = new VBox();
         vbox.getChildren().addAll(navbar.userNavbar(primaryStage, userSession), borderPane);
-
 
         Scene scene = new Scene(vbox, 600, 600);
         primaryStage.setScene(scene);
@@ -265,7 +260,6 @@ public class CartView {
     }
 
     private void displayProductDetails(CartList cart, VBox vBox) {
-        // Clear the existing content
         vBox.getChildren().clear();
         if (cartItems.size() == 0 && cart == null) {
             Label emptyLabel = new Label("No Item in Cart!");
@@ -281,6 +275,7 @@ public class CartView {
             vBox.getChildren().addAll(emptyLabel, emptyText);
             return;
         }
+        
         // Display product details
         Label nameLabel = new Label(cart.getProductName());
         nameLabel.setFont(Font.font("Arial Black", 12));
@@ -295,11 +290,10 @@ public class CartView {
         // quantity
         HBox qtc = new HBox();
         Label qtcLabel = new Label("Quantity: ");
-        // Create a SpinnerValueFactory with custom min, max, and initial values
         SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(Integer.MIN_VALUE, Integer.MAX_VALUE, cart.getQuantity());
 
-        // Create a Spinner with the custom value factory
+        // Spinner 
         Spinner<Integer> spinner = new Spinner<>();
         spinner.setValueFactory(valueFactory);
         spinner.valueProperty().addListener((obs, oldValue, newValue) ->
@@ -335,7 +329,6 @@ public class CartView {
                     preparedStatement.setString(2, userSession.getUserID());
                     successMsg = "Deleted from Cart";
                 } else if (value + cart.getQuantity() > 0) {
-//                  sql = "UPDATE cart SET quantity = ? + quantity WHERE productID = ? AND userID = ?";
                     sql = "UPDATE cart SET quantity = ? WHERE productID = ? AND userID = ?";
                     preparedStatement = conn.prepareStatement(sql);
                     preparedStatement.setInt(1, value);
