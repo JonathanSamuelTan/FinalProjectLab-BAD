@@ -216,6 +216,7 @@ public class HomePageView {
 
             while (resultSet.next()) {
                 Product product = new Product();
+                if(resultSet.getString("productID").equals("TE000")) {continue;}
                 product.setProductID(resultSet.getString("productID"));
                 product.setProductName(resultSet.getString("product_name"));
                 product.setProductPrice(resultSet.getInt("product_price"));

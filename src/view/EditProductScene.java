@@ -296,6 +296,7 @@ public class EditProductScene {
 		        showAlert("Error", "Error inserting product into the database.", AlertType.ERROR);
 		    }
 		}
+
 	 private String generateID() {
 		String productID = "";
 		String selectSQL = "SELECT productID FROM product ORDER BY productID DESC LIMIT 1";
@@ -364,8 +365,41 @@ public class EditProductScene {
 	
 	  
 	 public void removeProduct(String productID) {
+//		 delete transaction detail
+		 String tdSQL = "DELETE FROM transaction_detail WHERE productID = ?";
+         Connection conn = db.getConnection();
+	      try ( PreparedStatement preparedStatement = conn.prepareStatement(tdSQL)) {
+	          preparedStatement.setString(1, productID);
+	          int rowsAffected = preparedStatement.executeUpdate();
+	          if (rowsAffected > 0) {
+	          		System.out.println("berhasil");
+	          } else {
+	        	  	System.out.println("gada produk ini di detail");
+	          }
+	      } catch (SQLException e) {
+	          e.printStackTrace();
+	      }
+	     
+//		  hapus cart
+	      
+	      String cartSQL = "DELETE FROM cart WHERE productID = ?";
+          conn = db.getConnection();
+	        try ( PreparedStatement preparedStatement = conn.prepareStatement(cartSQL)) {
+	            preparedStatement.setString(1, productID);
+	            int rowsAffected = preparedStatement.executeUpdate();
+	            if (rowsAffected > 0) {
+	            	System.out.println("berhasil");
+	            } else {
+	            	System.out.println("gada produk ini di cart");
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+        
+        
+//	    delete di product
 	        String deleteSQL = "DELETE FROM Product WHERE productID = ?";
-	           Connection conn = db.getConnection();
+	           conn = db.getConnection();
 	        try ( PreparedStatement preparedStatement = conn.prepareStatement(deleteSQL)) {
 	            preparedStatement.setString(1, productID);
 	            int rowsAffected = preparedStatement.executeUpdate();
@@ -378,7 +412,7 @@ public class EditProductScene {
 	            e.printStackTrace();
 	        }
 	        
-	    }
+	   }
 	 
 	  public ArrayList<Product> retreiveRecord() {
 			ArrayList<Product> products=new ArrayList<>();
@@ -390,6 +424,7 @@ public class EditProductScene {
 
 			    while (resultSet.next()) {
 			    	String productID = resultSet.getString("productID");
+			    	if(productID.equals("TE000")) {continue;}
 			    	String productName = resultSet.getString("product_name");
 			    	Integer productPrice = resultSet.getInt("product_price");
 			    	String productDesc = resultSet.getString("product_des");
