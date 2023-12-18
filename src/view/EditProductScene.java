@@ -283,7 +283,7 @@ public class EditProductScene {
 		    Connection conn = db.getConnection();
 		    try (PreparedStatement preparedStatement = conn.prepareStatement(insertSQL)) {
 		        String index = Integer.toString(productList.size()+1);
-		        String id = (productList.size() > 99) ? "TE" + index : (productList.size() > 9) ? "TE0" + index : "TE00" + index;
+		        String id = generateID();
 
 		        preparedStatement.setString(1, id);
 		        preparedStatement.setString(2, name);
@@ -296,14 +296,32 @@ public class EditProductScene {
 		        showAlert("Error", "Error inserting product into the database.", AlertType.ERROR);
 		    }
 		}
+	 private String generateID() {
+		String productID = "";
+		String selectSQL = "SELECT productID FROM product ORDER BY productID DESC LIMIT 1";
+	    Connection conn = db.getConnection();
+	    try (PreparedStatement preparedStatement = conn.prepareStatement(selectSQL)) {
+		    ResultSet resultSet = preparedStatement.executeQuery();
 
-		private void showAlert(String title, String content, AlertType alertType) {
-		    Alert alert = new Alert(alertType);
-		    alert.setTitle(title);
-		    alert.setHeaderText(null);
-		    alert.setContentText(content);
-		    alert.showAndWait();
+		    while (resultSet.next()) {
+		    	String temp = resultSet.getString("productID");
+		    	int id = Integer.parseInt(temp.substring(2))+1;
+		    	productID = String.format("TE%03d", id);
+		    }
+		} catch (SQLException e) {
+		    e.printStackTrace();
 		}
+		
+	    return productID;    
+	 }
+
+	private void showAlert(String title, String content, AlertType alertType) {
+	    Alert alert = new Alert(alertType);
+	    alert.setTitle(title);
+	    alert.setHeaderText(null);
+	    alert.setContentText(content);
+	    alert.showAndWait();
+	}
 	
 	 public void updateProduct(String productID,String priceText) {
 		 if(priceText.trim().isEmpty()) {
