@@ -320,6 +320,7 @@ public class EditProductScene {
 	     }
 	    
 	    if(price<=0) {
+	    	showAlert("Error", "price must be greater than 0", AlertType.ERROR);
 	    	return;
 	    }
 		    

@@ -331,7 +331,7 @@ public class CartView {
                 } else if (value + cart.getQuantity() > 0) {
                     sql = "UPDATE cart SET quantity = ? WHERE productID = ? AND userID = ?";
                     preparedStatement = conn.prepareStatement(sql);
-                    preparedStatement.setInt(1, value);
+                    preparedStatement.setInt(1, value + cart.getQuantity());
                     preparedStatement.setString(2, cart.getProductID());
                     preparedStatement.setString(3, userSession.getUserID());
                     successMsg = "Updated Cart";

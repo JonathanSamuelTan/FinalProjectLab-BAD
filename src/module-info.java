@@ -7,7 +7,9 @@ module FinalProjectLabBAD {
     requires javafx.swing;
     requires javafx.fxml;
     requires java.sql;
-    requires mysql.connector.java;
+//  kalau error, ganti namanya sesuai dengan nama jar nya :D  
+    requires mysql.connector.j;
+    
     opens main;
     opens controller;
     opens model;
